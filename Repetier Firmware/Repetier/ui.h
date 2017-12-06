@@ -390,18 +390,21 @@ extern const int8_t encoder_table[16] PROGMEM ;
 #define SDSUPPORT 1
 #endif
 
-#if  FEATURE_CONTROLLER == CONTROLLER_RAMBO
-#undef SDCARDDETECT
-#if MOTHERBOARD == 301
-#define SDCARDDETECT 81
-#endif
-#if MOTHERBOARD == 302
-#define SDCARDDETECT 15
-#endif
-#undef SDCARDDETECTINVERTED
-#define SDCARDDETECTINVERTED 0
-#undef SDSUPPORT
-#define SDSUPPORT 1
+#if 0
+    // Not sure why this is going out of its way to override Configuration.h and Printer.h but I don't like it.
+    #if  FEATURE_CONTROLLER == CONTROLLER_RAMBO
+    #undef SDCARDDETECT
+    #if MOTHERBOARD == 301
+    #define SDCARDDETECT 81
+    #endif
+    #if MOTHERBOARD == 302
+    #define SDCARDDETECT 15
+    #endif
+    #undef SDCARDDETECTINVERTED
+    #define SDCARDDETECTINVERTED 0
+    #undef SDSUPPORT
+    #define SDSUPPORT 1
+    #endif
 #endif
 
 // Maximum size of a row - if row is larger, text gets scrolled
