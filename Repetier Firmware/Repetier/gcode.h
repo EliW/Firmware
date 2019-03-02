@@ -213,6 +213,7 @@ private:
     static uint8_t commentDetected; ///< Flags true if we are reading the comment part of a command.
     static uint8_t binaryCommandSize; ///< Expected size of the incoming binary command.
     static bool waitUntilAllCommandsAreParsed; ///< Don't read until all commands are parsed. Needed if gcode_buffer is misused as storage for strings.
+    static bool inputOverflow; ///< After exiting waitUntilAllCommandsAreParsed, purge the serial port.
     static uint32_t lastLineNumber; ///< Last line number received.
     static uint32_t actLineNumber; ///< Line number of current command.
     static int8_t waitingForResend; ///< Waiting for line to be resend. -1 = no wait.

@@ -37,6 +37,7 @@ uint8_t  GCode::wasLastCommandReceivedAsBinary = 0; ///< Was the last successful
 uint8_t  GCode::commentDetected = false; ///< Flags true if we are reading the comment part of a command.
 uint8_t  GCode::binaryCommandSize; ///< Expected size of the incoming binary command.
 bool     GCode::waitUntilAllCommandsAreParsed = false; ///< Don't read until all commands are parsed. Needed if gcode_buffer is misused as storage for strings.
+bool     GCode::inputOverflow = false; ///< After exiting waitUntilAllCommandsAreParsed, purge the serial port.
 uint32_t GCode::lastLineNumber = 0; ///< Last line number received.
 uint32_t GCode::actLineNumber; ///< Line number of current command.
 int8_t   GCode::waitingForResend = -1; ///< Waiting for line to be resend. -1 = no wait.
@@ -329,9 +330,29 @@ It must be called frequently to empty the incoming buffer.
 */
 void GCode::readFromSerial()
 {
-    if(bufferLength >= GCODE_BUFFER_SIZE) return; // all buffers full
-    if(waitUntilAllCommandsAreParsed && bufferLength) return;
-    waitUntilAllCommandsAreParsed = false;
+    if(bufferLength >= GCODE_BUFFER_SIZE) {
+        // The command buffer is full.  Can't accept any new commands, so wait until we've popped at least one.
+        // But, while we're not reading from the serial port, we can't know how long it's been or whether we've missed input.
+        // So, drain all the commands, then ask the controller to start over.
+        waitUntilAllCommandsAreParsed = true;
+        inputOverflow = true;
+        return;
+    }
+    if (waitUntilAllCommandsAreParsed) {
+        if (bufferLength) {
+            // There are still commands to execute, so finish them.
+            return;
+        } else {
+            // We're out of commands.  Now start parsing again.
+            waitUntilAllCommandsAreParsed = false;
+            if (inputOverflow) {
+                // And, let the controller know that we might have missed serial input since the last command processed.
+                requestResend();
+                inputOverflow = false;
+            }
+        }
+    }
+
     millis_t time = HAL::timeInMilliseconds();
     if(!HAL::serialByteAvailable())
     {
