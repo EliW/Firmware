@@ -59,7 +59,7 @@ Hacker H2        = 6
 #endif
 
 #define Z_LIFT_ON_PAUSE 20         // Amount to lift the head (mm) when pausing from the LCD screen
-#define MIN_DEFECT_TEMPERATURE 16  // this is the min temp that will allow the hotend to start heating.  Below this it will show as defective to help identify bad thermistors
+#define MIN_DEFECT_TEMPERATURE 13  // this is the min temp that will allow the hotend to start heating.  Below this it will show as defective to help identify bad thermistors
 #define MAX_DEFECT_TEMPERATURE 300 // this is the max temp that wthe printer will throw errors about defective thermistors
 
 #define MIXING_EXTRUDER 0
