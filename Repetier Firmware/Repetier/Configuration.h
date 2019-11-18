@@ -472,12 +472,12 @@ Hacker H2        = 6
 #define Z_PROBE_Y3 142.68
 
 //#if NUM_EXTRUDER <= 1
- #define SDSUPPORT  1
- #define SDCARDDETECT  81
+// #define SDSUPPORT  1
+// #define SDCARDDETECT  81
 //#else
  // Runs out of RAM with two extruders - so try disabling SD, I never use that anyway.
-// #define SDSUPPORT  0
-// #define SDCARDDETECT  -1
+ #define SDSUPPORT  0
+ #define SDCARDDETECT  -1
 //#endif
 #define SDCARDDETECTINVERTED 0
 #define FEATURE_CONTROLLER 13

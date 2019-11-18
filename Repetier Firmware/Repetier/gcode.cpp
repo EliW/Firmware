@@ -334,6 +334,7 @@ void GCode::readFromSerial()
         // The command buffer is full.  Can't accept any new commands, so wait until we've popped at least one.
         // But, while we're not reading from the serial port, we can't know how long it's been or whether we've missed input.
         // So, drain all the commands, then ask the controller to start over.
+Com::printFLN(PSTR("EDEBUG 337: Command Buffer Full"));
         waitUntilAllCommandsAreParsed = true;
         inputOverflow = true;
         return;
@@ -341,11 +342,14 @@ void GCode::readFromSerial()
     if (waitUntilAllCommandsAreParsed) {
         if (bufferLength) {
             // There are still commands to execute, so finish them.
+Com::printFLN(PSTR("EDEBUG 345: Still Commands to Execute"));
             return;
         } else {
             // We're out of commands.  Now start parsing again.
             waitUntilAllCommandsAreParsed = false;
+Com::printFLN(PSTR("EDEBUG 350: Start Parsing Again"));
             if (inputOverflow) {
+Com::printFLN(PSTR("EDEBUG 352: Requesting Resend (InputOverflow)"));
                 // And, let the controller know that we might have missed serial input since the last command processed.
                 requestResend();
                 inputOverflow = false;
@@ -358,6 +362,7 @@ void GCode::readFromSerial()
     {
         if((waitingForResend >= 0 || commandsReceivingWritePosition > 0) && time - timeOfLastDataPacket > 200)
         {
+Com::printFLN(PSTR("EDEBUG 365: Requesting Resend (Something is wrong)"));
             requestResend(); // Something is wrong, a started line was not continued in the last second
             timeOfLastDataPacket = time;
         }
@@ -402,8 +407,10 @@ void GCode::readFromSerial()
                 GCode *act = &commandsBuffered[bufferWriteIndex];
                 if(act->parseBinary(commandReceiving, true))   // Success
                     act->checkAndPushCommand();
-                else
+                else {
+Com::printFLN(PSTR("EDEBUG 411: Requesting Resend (Binary Failure)"));
                     requestResend();
+                }
                 commandsReceivingWritePosition = 0;
                 return;
             }
@@ -424,8 +431,10 @@ void GCode::readFromSerial()
                 GCode *act = &commandsBuffered[bufferWriteIndex];
                 if(act->parseAscii((char *)commandReceiving, true))   // Success
                     act->checkAndPushCommand();
-                else
+                else {
+Com::printFLN(PSTR("EDEBUG 435: Requesting Resend (Ascii Failure)"));
                     requestResend();
+                }
                 commandsReceivingWritePosition = 0;
                 return;
             }
@@ -437,6 +446,7 @@ void GCode::readFromSerial()
         }
         if(commandsReceivingWritePosition == MAX_CMD_SIZE)
         {
+Com::printFLN(PSTR("EDEBUG 449: Requesting Resend (MAX_CMD_SIZE)"));
             requestResend();
             return;
         }
